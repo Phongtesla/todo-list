@@ -36,7 +36,7 @@ export default {
 
 <style scoped >
 .form-group{
-  margin: 15px 0;
+  margin-bottom: 15px;
 }
 
 .form-group label{
@@ -58,10 +58,5 @@ export default {
 .form__task-status--due-date, .form__task-status--piority{
   width: 45%;
 }
-.btn-update{
-  background-color: aqua;
-}
-.btn-add{
-  background-color: rgb(9, 100, 100);
-}
+
 </style>

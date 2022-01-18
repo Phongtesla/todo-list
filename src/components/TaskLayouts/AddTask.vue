@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import Form from "./TaskLayouts/Form.vue";
+import Form from "./Form.vue";
 export default {
   components: {
     Form,
@@ -16,7 +16,7 @@ export default {
 
 <style scoped >
 .add-form {
-  border: 1px solid #8f8686;
+  border-right: 1px solid #8f8686;
   width: 40%;
 }
 .add-form > form {

@@ -16,7 +16,7 @@ export const router = new VueRouter({
 import { store } from "./store";
 
 // render page title
-const DEFAULT_TITLE = "Task List";
+const DEFAULT_TITLE = "Todo List";
 router.afterEach((to) => {
   Vue.nextTick(() => {
     document.title = to.meta.title || DEFAULT_TITLE;

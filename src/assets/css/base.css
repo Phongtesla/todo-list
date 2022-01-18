@@ -16,10 +16,22 @@
   color: white;
   cursor: pointer;
 }
-
-.d-flex{
+.btn-detail {
+  background-color: blue;
+  margin-right: 10px;
+}
+.btn-remove {
+  background-color: red;
+}
+.btn-update {
+  background-color: rgb(9, 156, 21);
+}
+.btn-add {
+  background-color: rgb(9, 100, 100);
+}
+.d-flex {
   display: flex;
 }
-.flex-col{
+.flex-col {
   flex-direction: column;
 }
