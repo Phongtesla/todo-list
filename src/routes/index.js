@@ -6,5 +6,5 @@ export default [
     component: TaskList,
     name: "todo-list",
   },
-  
+
 ];
