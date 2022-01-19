@@ -35,3 +35,8 @@
 .flex-col {
   flex-direction: column;
 }
+
+.err{
+  margin-top: 5px;
+  color: red;
+}
