@@ -17,7 +17,7 @@
       <div class="form-group form__task-status--due-date d-flex flex-col">
         <label for="due-date">Due Date</label>
         <input v-model="task.dueDate" type="date" required />
-        <p v-if="errors.title" class="err">{{ errors.title }}</p>
+        <p v-if="errors.dueDate" class="err">{{ errors.dueDate }}</p>
       </div>
       <div class="form-group form__task-status--piority d-flex flex-col">
         <label for="piority">Piority</label>

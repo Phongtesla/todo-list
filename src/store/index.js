@@ -29,13 +29,22 @@ export const store = new Vuex.Store({
     errors: (state) => state.errors,
   },
   actions: {
+    getTasks({ commit }, searchKey) {
+      let tasks = JSON.parse(localStorage.getItem("taskList"));
+      //filter by name
+      if (searchKey) {
+        tasks = tasks.filter((task) => task.title.indexOf(searchKey) != -1);
+      }
+
+      commit("setTasks", tasks);
+    },
     addTask({ commit, dispatch }, task) {
       dispatch("validate", task)
         .then((res) => {
-          console.log(res);
           if (res) {
             commit("pushTask", task);
             commit("emptyErr");
+            commit('setTasks', null);
           }
         })
         .finally(() => {
@@ -49,13 +58,13 @@ export const store = new Vuex.Store({
       let today = new Date();
       let checkDudate = dueDate.getTime() + 86400000 >= today.getTime();
 
+      // create message when validate failed
       if (title == "" || checkDudate === false) {
         if (title == "") commit("assignErr", "title");
         if (checkDudate === false) commit("assignErr", "duedate");
         return false;
       }
       return true;
-      // create message when validate failed
     },
   },
   mutations: {
@@ -63,8 +72,6 @@ export const store = new Vuex.Store({
       let tasks = JSON.parse(localStorage.getItem("taskList")) ?? [];
       tasks.push(task);
       localStorage.setItem("taskList", JSON.stringify(tasks));
-      // add task in state
-      state.tasks.push(task);
     },
     assignErr(state, type) {
       if (type == "title") {
@@ -85,6 +92,15 @@ export const store = new Vuex.Store({
       let today = new Date().toISOString().substr(0, 10);
       state.task.dueDate = today;
       state.task.priority = 2;
+    },
+    setTasks(state, tasks) {
+      if (!tasks) {
+        tasks = JSON.parse(localStorage.getItem("taskList"));
+      }
+      tasks = tasks.sort((task1, task2) => {
+        return new Date(task2.dueDate) - new Date(task1.dueDate);
+      });
+      state.tasks = tasks;
     },
   },
 });

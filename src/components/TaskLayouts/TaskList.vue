@@ -2,12 +2,16 @@
   <div class="task-list container">
     <h2>Task List</h2>
     <div class="task-list__body">
-      <input type="text" placeholder="Search..." required />
-      <div class="task-list__body--task">
+      <input type="text" placeholder="Search..." required v-model="searchKey"/>
+      <div
+        v-for="(task, index) in tasks"
+        :key="index"
+        class="task-list__body--task"
+      >
         <div class="task-header d-flex">
           <div class="input-group d-flex">
             <input type="checkbox" />
-            <p>But you'll never be alone</p>
+            <p>{{ task.title }}</p>
           </div>
           <div class="task-actions d-flex">
             <button @click="showDetail = !showDetail" class="btn btn-detail">
@@ -17,14 +21,16 @@
           </div>
         </div>
         <div v-if="showDetail" class="task-detail">
-          <Form :type="'update'"></Form>
+          <Form :type="'update'" :taskEdit="task"></Form>
         </div>
       </div>
+      <p v-if="tasks.length == 0">have no task</p>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions, mapGetters } from "vuex";
 import Form from "./Form.vue";
 export default {
   components: {
@@ -33,8 +39,23 @@ export default {
   data() {
     return {
       showDetail: false,
+      searchKey: "",
     };
   },
+  created() {
+    this.getTasks();
+  },
+  computed: {
+    ...mapGetters(["tasks"]),
+  },
+  methods: {
+    ...mapActions(["getTasks"]),
+  },
+  watch:{
+    searchKey(){
+      this.getTasks(this.searchKey);
+    }
+  }
 };
 </script>
 
