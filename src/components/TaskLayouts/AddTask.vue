@@ -1,15 +1,15 @@
 <template>
   <div class="add-form container">
     <h2>New Task</h2>
-    <Form :type="'add'"></Form>
+    <form-add :type="'add'"></form-add>
   </div>
 </template>
 
 <script>
-import Form from "./Form.vue";
+import FormAdd from './FormAdd.vue';
 export default {
   components: {
-    Form,
+    FormAdd,
   },
 };
 </script>

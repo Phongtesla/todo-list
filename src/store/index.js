@@ -6,7 +6,8 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
     tasks: [],
-    task: {
+    taskEdit: {},
+    taskAdd: {
       id: null,
       title: "",
       desc: "",
@@ -17,22 +18,31 @@ export const store = new Vuex.Store({
       title: null,
       dueDate: null,
     },
+    errorsUpdate: {
+      title: null,
+      dueDate: null,
+    },
     checkedTasks: {},
+    updateStatus: false,
   },
   getters: {
     tasks: (state) => state.tasks,
-    task: (state) => {
+    taskEdit: (state) => state.taskEdit,
+    taskAdd: (state) => {
       let today = new Date().toISOString().substr(0, 10);
-      state.task.dueDate = today;
-      return state.task;
+      state.taskAdd.dueDate = today;
+      return state.taskAdd;
     },
     checkedTasks: (state) => state.checkedTasks,
     errors: (state) => state.errors,
+    errorsUpdate: (state) => state.errorsUpdate,
+    updateStatus: (state) => state.updateStatus,
   },
   actions: {
     removeTask({ commit }, taskId) {
-      commit('rmTask', taskId)
+      commit("rmTask", taskId);
     },
+
     getTasks({ commit }, searchKey) {
       let tasks = JSON.parse(localStorage.getItem("taskList"));
       //filter by name
@@ -42,12 +52,13 @@ export const store = new Vuex.Store({
 
       commit("setTasks", tasks);
     },
+
     addTask({ commit, dispatch }, task) {
-      dispatch("validate", task)
+      dispatch("validate", { task, type: "add" })
         .then((res) => {
           if (res) {
             commit("pushTask", task);
-            commit("emptyErr");
+            commit("emptyErr", "add");
             commit("setTasks", null);
           }
         })
@@ -55,7 +66,23 @@ export const store = new Vuex.Store({
           commit("emptyTask");
         });
     },
-    validate({ commit }, task) {
+
+    updateTask({ commit, dispatch }, task) {
+      dispatch("validate", { task, type: "update" })
+        .then((res) => {
+          if (res) {
+            commit("setNewTaskInfo", task);
+            commit("emptyErr", "update");
+            commit("updateSuccess");
+            // commit("setTasks", null);
+          }
+        })
+        .finally(() => {
+          commit("emptyTask");
+        });
+    },
+
+    validate({ commit }, { task, type }) {
       // validate: title is required;  due date must be greater than today
       let title = task.title.trim();
       let dueDate = new Date(task.dueDate);
@@ -64,20 +91,33 @@ export const store = new Vuex.Store({
 
       // create message when validate failed
       if (title == "" || checkDudate === false) {
-        if (title == "") commit("assignErr", "title");
-        if (checkDudate === false) commit("assignErr", "duedate");
+        if (title == "") commit("assignErr", { type, msg: "title" });
+        if (checkDudate === false)
+          commit("assignErr", { type, msg: "duedate" });
         return false;
       }
       return true;
     },
   },
   mutations: {
-    rmTask(state, taskId){
+    setNewTaskInfo(state, newTask) {
+      //update on local storage
       let tasks = JSON.parse(localStorage.getItem("taskList"));
-      let taskIndex = state.tasks.findIndex((task) => task.id === taskId);
-      // remove from local storage 
-      tasks.splice(taskIndex, 1);
+      let taskIndexAtLocal = tasks.findIndex((task) => task.id === newTask.id);
+      tasks.splice(taskIndexAtLocal, 1, newTask);
+      // update on state
+      let taskIndex = state.tasks.findIndex((task) => task.id === newTask.id);
+      state.tasks.splice(taskIndex, 1, newTask);
+      // update taskList on local storage
+      localStorage.setItem("taskList", JSON.stringify(tasks));
+    },
+    rmTask(state, taskId) {
+      let tasks = JSON.parse(localStorage.getItem("taskList"));
+      let taskIndexAtLocal = tasks.findIndex((task) => task.id === taskId);
+      tasks.splice(taskIndexAtLocal, 1);
+      // remove from local storage
       // remove from state
+      let taskIndex = state.tasks.findIndex((task) => task.id === taskId);
       state.tasks.splice(taskIndex, 1);
       // update taskList on local storage
       localStorage.setItem("taskList", JSON.stringify(tasks));
@@ -95,25 +135,41 @@ export const store = new Vuex.Store({
       tasks.push(task);
       localStorage.setItem("taskList", JSON.stringify(tasks));
     },
-    assignErr(state, type) {
-      if (type == "title") {
-        state.errors.title = "Title field is required";
+    assignErr(state, { type, msg }) {
+      if (type == "add") {
+        if (msg == "title") {
+          state.errors.title = "Title field is required";
+        }
+        if (msg == "duedate") {
+          state.errors.dueDate =
+            "The due date must be greater than or equal today";
+        }
       }
-      if (type == "duedate") {
-        state.errors.dueDate =
-          "The due date must be greater than or equal today";
+      if (type == "update") {
+        if (msg == "title") {
+          state.errorsUpdate.title = "Title field is required";
+        }
+        if (msg == "duedate") {
+          state.errorsUpdate.dueDate =
+            "The due date must be greater than or equal today";
+        }
       }
     },
-    emptyErr(state) {
-      state.errors.title = null;
-      state.errors.dueDate = null;
+    emptyErr(state, type) {
+      if (type == "add") {
+        state.errors.title = null;
+        state.errors.dueDate = null;
+      } else {
+        state.errorsUpdate.title = null;
+        state.errorsUpdate.dueDate = null;
+      }
     },
     emptyTask(state) {
-      state.task.title = "";
-      state.task.desc = "";
+      state.taskAdd.title = "";
+      state.taskAdd.desc = "";
       let today = new Date().toISOString().substr(0, 10);
-      state.task.dueDate = today;
-      state.task.priority = 2;
+      state.taskAdd.dueDate = today;
+      state.taskAdd.priority = 2;
     },
     setTasks(state, tasks) {
       if (!tasks) {
@@ -126,5 +182,14 @@ export const store = new Vuex.Store({
       }
       state.tasks = tasks;
     },
+    setTaskEdit(state, task) {
+      state.taskEdit = task;
+    },
+    updateSuccess(state){
+      state.updateStatus = true;
+      setTimeout(() => {
+        state.updateStatus = false;
+      }, 3000);
+    }
   },
 });
