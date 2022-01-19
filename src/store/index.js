@@ -7,6 +7,7 @@ export const store = new Vuex.Store({
   state: {
     tasks: [],
     task: {
+      id: null,
       title: "",
       desc: "",
       dueDate: null,
@@ -29,6 +30,9 @@ export const store = new Vuex.Store({
     errors: (state) => state.errors,
   },
   actions: {
+    removeTask({ commit }, taskId) {
+      commit('rmTask', taskId)
+    },
     getTasks({ commit }, searchKey) {
       let tasks = JSON.parse(localStorage.getItem("taskList"));
       //filter by name
@@ -44,7 +48,7 @@ export const store = new Vuex.Store({
           if (res) {
             commit("pushTask", task);
             commit("emptyErr");
-            commit('setTasks', null);
+            commit("setTasks", null);
           }
         })
         .finally(() => {
@@ -68,8 +72,26 @@ export const store = new Vuex.Store({
     },
   },
   mutations: {
+    rmTask(state, taskId){
+      let tasks = JSON.parse(localStorage.getItem("taskList"));
+      let taskIndex = state.tasks.findIndex((task) => task.id === taskId);
+      // remove from local storage 
+      tasks.splice(taskIndex, 1);
+      // remove from state
+      state.tasks.splice(taskIndex, 1);
+      // update taskList on local storage
+      localStorage.setItem("taskList", JSON.stringify(tasks));
+    },
     pushTask(state, task) {
       let tasks = JSON.parse(localStorage.getItem("taskList")) ?? [];
+      let taskId =
+        tasks.length > 0
+          ? Math.max.apply(
+              null,
+              tasks.map((item) => item.id)
+            ) + 1
+          : 1;
+      task.id = taskId;
       tasks.push(task);
       localStorage.setItem("taskList", JSON.stringify(tasks));
     },
@@ -95,11 +117,13 @@ export const store = new Vuex.Store({
     },
     setTasks(state, tasks) {
       if (!tasks) {
-        tasks = JSON.parse(localStorage.getItem("taskList"));
+        tasks = JSON.parse(localStorage.getItem("taskList")) ?? [];
       }
-      tasks = tasks.sort((task1, task2) => {
-        return new Date(task2.dueDate) - new Date(task1.dueDate);
-      });
+      if (tasks.length > 0) {
+        tasks = tasks.sort((task1, task2) => {
+          return new Date(task2.dueDate) - new Date(task1.dueDate);
+        });
+      }
       state.tasks = tasks;
     },
   },

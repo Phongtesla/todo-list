@@ -17,7 +17,7 @@
             <button @click="showDetail = !showDetail" class="btn btn-detail">
               Detail
             </button>
-            <button class="btn btn-remove">Remove</button>
+            <button @click="removeTask(task.id)" class="btn btn-remove">Remove</button>
           </div>
         </div>
         <div v-if="showDetail" class="task-detail">
@@ -49,7 +49,7 @@ export default {
     ...mapGetters(["tasks"]),
   },
   methods: {
-    ...mapActions(["getTasks"]),
+    ...mapActions(["getTasks", "removeTask"]),
   },
   watch:{
     searchKey(){
