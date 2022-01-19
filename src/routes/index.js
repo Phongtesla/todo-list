@@ -1,10 +1,10 @@
-import TaskList from "../components/TaskList";
+import TodoList from "../components/TodoList";
 
 export default [
   {
     path: "/",
-    component: TaskList,
+    component: TodoList,
     name: "todo-list",
   },
-  
+
 ];
