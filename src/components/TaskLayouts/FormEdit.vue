@@ -1,27 +1,30 @@
 <template>
   <form class="form">
+    <div v-if="updateStatus" class="alert-success">
+     <p> updated successfully</p>
+    </div>
     <div class="form-group form__task-name">
       <input
-        v-model="task.title"
+        v-model="taskEdit.title"
         type="text"
         placeholder="Add new task..."
         required
       />
-      <p v-if="errors.title" class="err">{{ errors.title }}</p>
+      <p v-if="errorsUpdate.title" class="err">{{ errorsUpdate.title }}</p>
     </div>
     <div class="form-group form__task-desc d-flex flex-col">
       <label for="desc">Description</label>
-      <textarea v-model="task.desc" id="desc" cols="30" rows="10"></textarea>
+      <textarea v-model="taskEdit.desc" id="desc" cols="30" rows="10"></textarea>
     </div>
     <div class="form__task-status d-flex">
       <div class="form-group form__task-status--due-date d-flex flex-col">
         <label for="due-date">Due Date</label>
-        <input v-model="task.dueDate" type="date" required />
-        <p v-if="errors.title" class="err">{{ errors.title }}</p>
+        <input v-model="taskEdit.dueDate" type="date" required />
+        <p v-if="errorsUpdate.dueDate" class="err">{{ errorsUpdate.dueDate }}</p>
       </div>
       <div class="form-group form__task-status--piority d-flex flex-col">
         <label for="piority">Piority</label>
-        <select v-model="task.priority" name="" id="piority">
+        <select v-model="taskEdit.priority" name="" id="piority">
           <option value="3">Low</option>
           <option selected value="2">Normal</option>
           <option value="1">High</option>
@@ -29,34 +32,30 @@
       </div>
     </div>
     <div class="form-group form__add-btn">
-      <button v-if="this.type == 'update'" class="btn btn-update">
+      <button @click.prevent="updateTask(task)" class="btn btn-update">
         Update
-      </button>
-      <button v-else @click.prevent="addTask(task)" class="btn btn-add">
-        Add New
       </button>
     </div>
   </form>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 import { mapActions } from "vuex";
 export default {
-  props: ["type", "taskEdit"],
+  props: ["type", "task"],
   computed: {
-    ...mapGetters(["task", "errors"]),
+    ...mapGetters(["taskEdit", "errorsUpdate", "updateStatus"]),
   },
   data() {
     return {};
   },
-  created() {
-    if (this.type == "update") {
-      this.task = this.taskEdit;
-    }
+  created(){
+    this.setTaskEdit(this.task);
   },
   methods: {
-    ...mapActions(["addTask"]),
+    ...mapActions(["updateTask"]),
+    ...mapMutations(["setTaskEdit"]),
   },
 };
 </script>
@@ -87,5 +86,9 @@ export default {
 .form__task-status--piority {
   width: 45%;
 }
-
+.alert-success{
+  background-color: rgb(4, 167, 4);
+  color: white;
+  padding: 7px;
+}
 </style>

@@ -2,38 +2,46 @@
   <div class="task-list container">
     <h2>Task List</h2>
     <div class="task-list__body">
-      <input type="text" placeholder="Search..." required />
-      <div class="task-list__body--task">
-        <div class="task-header d-flex">
-          <div class="input-group d-flex">
-            <input type="checkbox" />
-            <p>But you'll never be alone</p>
-          </div>
-          <div class="task-actions d-flex">
-            <button @click="showDetail = !showDetail" class="btn btn-detail">
-              Detail
-            </button>
-            <button class="btn btn-remove">Remove</button>
-          </div>
-        </div>
-        <div v-if="showDetail" class="task-detail">
-          <Form :type="'update'"></Form>
-        </div>
-      </div>
+      <input type="text" placeholder="Search..." required v-model="searchKey" />
+
+      <Task
+        v-for="(task, index) in tasks"
+        :key="index"
+        class="task-list__body--task"
+        :task="task"
+      >
+      </Task>
+      <p v-if="tasks.length == 0">have no task</p>
     </div>
   </div>
 </template>
 
 <script>
-import Form from "./Form.vue";
+import { mapActions, mapGetters } from "vuex";
+import Task from "./Task.vue";
 export default {
   components: {
-    Form,
+    Task,
   },
   data() {
     return {
       showDetail: false,
+      searchKey: "",
     };
+  },
+  created() {
+    this.getTasks();
+  },
+  computed: {
+    ...mapGetters(["tasks"]),
+  },
+  methods: {
+    ...mapActions(["getTasks", "removeTask"]),
+  },
+  watch: {
+    searchKey() {
+      this.getTasks(this.searchKey);
+    },
   },
 };
 </script>
@@ -59,25 +67,5 @@ export default {
   border: 1px solid #ced4da;
   border-radius: 4px;
   margin-bottom: 15px;
-}
-.input-group {
-  align-items: center;
-}
-.input-group input {
-  margin: 0 10px 1px 0;
-}
-.task-list__body--task {
-  margin-bottom: 15px;
-}
-.task-header {
-  width: 100%;
-  height: 70px;
-  border: 1px solid #ced4da;
-  padding: 0 5px;
-  justify-content: space-between;
-  align-items: center;
-}
-.task-detail form {
-  border: 1px solid #ced4da;
 }
 </style>
