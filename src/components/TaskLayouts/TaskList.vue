@@ -63,7 +63,7 @@ export default {
 
 <style scoped >
 .task-list {
-  width: 60%;
+  width: 100%;
   border-left: 1px solid #8f8686;
   position: relative;
 }
