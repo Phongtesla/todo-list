@@ -22,7 +22,7 @@ export const store = new Vuex.Store({
       title: null,
       dueDate: null,
     },
-    checkedTasks: {},
+    checkedTasks: [],
     updateStatus: false,
   },
   getters: {
@@ -39,6 +39,10 @@ export const store = new Vuex.Store({
     updateStatus: (state) => state.updateStatus,
   },
   actions: {
+    checkTask({ commit }, taskId) {
+      commit("pushTaskId", taskId);
+    },
+
     removeTask({ commit }, taskId) {
       commit("rmTask", taskId);
     },
@@ -100,6 +104,38 @@ export const store = new Vuex.Store({
     },
   },
   mutations: {
+    removeMultipleTasks(state, taskIds) {
+      let taskList = JSON.parse(localStorage.getItem("taskList"));
+
+      for (let i = taskIds.length - 1; i >= 0; i--) {
+        let taskIndex = state.tasks.findIndex((task) => task.id === taskIds[i]);
+
+        // remove on local storage
+        taskList.splice(taskIndex, 1);
+
+        // remove on state
+        state.tasks.splice(taskIndex, 1);
+
+      }
+      // remove checked task on state
+      state.checkedTasks = [];
+      localStorage.setItem("taskList", JSON.stringify(taskList));
+      // update state 
+      state.tasks = JSON.parse(localStorage.getItem("taskList"));
+    },
+
+    pushTaskId(state, taskId) {
+      //check existence of taskId in checked list. if not => push into array ids, if it is => rm from array
+      let taskIdIndex = state.checkedTasks.findIndex(
+        (taskIdChecked) => taskIdChecked == taskId
+      );
+      if (taskIdIndex != -1) {
+        state.checkedTasks.splice(taskIdIndex, 1);
+      } else {
+        state.checkedTasks.push(taskId);
+      }
+    },
+
     setNewTaskInfo(state, newTask) {
       //update on local storage
       let tasks = JSON.parse(localStorage.getItem("taskList"));
@@ -114,11 +150,15 @@ export const store = new Vuex.Store({
     rmTask(state, taskId) {
       let tasks = JSON.parse(localStorage.getItem("taskList"));
       let taskIndexAtLocal = tasks.findIndex((task) => task.id === taskId);
-      tasks.splice(taskIndexAtLocal, 1);
       // remove from local storage
+      tasks.splice(taskIndexAtLocal, 1);
       // remove from state
       let taskIndex = state.tasks.findIndex((task) => task.id === taskId);
       state.tasks.splice(taskIndex, 1);
+      
+      // index of checked Tasks
+      let indexOfcheckedTasks = state.checkedTasks.findIndex((id) => id === taskId);
+      state.checkedTasks.splice(indexOfcheckedTasks, 1);
       // update taskList on local storage
       localStorage.setItem("taskList", JSON.stringify(tasks));
     },
@@ -185,11 +225,11 @@ export const store = new Vuex.Store({
     setTaskEdit(state, task) {
       state.taskEdit = task;
     },
-    updateSuccess(state){
+    updateSuccess(state) {
       state.updateStatus = true;
       setTimeout(() => {
         state.updateStatus = false;
       }, 3000);
-    }
+    },
   },
 });
