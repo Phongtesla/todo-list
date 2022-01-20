@@ -1,4 +1,12 @@
 # todo-list
+## Result
+```
+- function: add, update, bulk action, search, remove, validate.
+- css only
+- reponsive
+- data is stored in local storage
+- the code is broken into different component
+```
 
 ## Project setup
 ```
