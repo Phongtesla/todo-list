@@ -2,7 +2,7 @@
   <div class="task-list__body--task">
     <div class="task-header d-flex">
       <div class="input-group d-flex">
-        <input type="checkbox" />
+        <input type="checkbox" :checked="checkedTasks.includes(task.id)" :value="task.id" @click="checkTask(task.id)"/>
         <p>{{ task.title }}</p>
       </div>
       <div class="task-actions d-flex">
@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
-import FormEdit from './FormEdit.vue';
+import { mapActions, mapGetters } from "vuex";
+import FormEdit from "./FormEdit.vue";
 export default {
   props: ["task"],
   components: {
@@ -33,8 +33,11 @@ export default {
       showDetail: false,
     };
   },
+    computed: {
+    ...mapGetters(["checkedTasks"]),
+  },
   methods: {
-    ...mapActions(["removeTask"]),
+    ...mapActions(["removeTask", "checkTask"]),
   },
 };
 </script>

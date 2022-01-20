@@ -1,5 +1,5 @@
 <template>
-  <div class="add-form container">
+  <div class="add-form ">
     <h2>New Task</h2>
     <form-add :type="'add'"></form-add>
   </div>
@@ -16,7 +16,6 @@ export default {
 
 <style scoped >
 .add-form {
-  border-right: 1px solid #8f8686;
   width: 40%;
 }
 .add-form > form {
